@@ -19,9 +19,9 @@ import common._
  * - The `-` character denotes parts which are outside the terrain
  * - `o` denotes fields which are part of the terrain
  * - `S` denotes the start position of the block (which is also considered
-     inside the terrain)
+  * inside the terrain)
  * - `T` denotes the final position of the block (which is also considered
-     inside the terrain)
+  * inside the terrain)
  *
  * In this example, the first and last lines could be omitted, and
  * also the columns that consist of `-` characters only.
@@ -53,8 +53,10 @@ trait StringParserTerrain extends GameDef {
    * by `levelVector`.
    */
   def terrainFunction(levelVector: Vector[Vector[Char]]): Pos => Boolean = p => {
-    val c = levelVector(p.x)(p.y)
-    c == 'o' || c == 'S' || c == 'T'
+    p.x >= 0 && p.x < levelVector.size && p.y >= 0 && p.y < levelVector(p.x).size && {
+      val c = levelVector(p.x)(p.y)
+      c == 'o' || c == 'S' || c == 'T'
+    }
   }
 
   /**
@@ -66,8 +68,8 @@ trait StringParserTerrain extends GameDef {
    * `Vector` class
    */
   def findChar(c: Char, levelVector: Vector[Vector[Char]]): Pos = {
-    val allpos = for { i <- 0 to levelVector.length - 1
-          j <- 0 to levelVector(i).length - 1 } yield (i, j)
+    val allpos = for { i <- levelVector.indices
+          j <- levelVector(i).indices } yield (i, j)
 
     val p = (allpos filter { case (i, j) => levelVector(i)(j) == c}).head
     Pos(p._1, p._2)
@@ -79,5 +81,4 @@ trait StringParserTerrain extends GameDef {
   lazy val terrain: Terrain = terrainFunction(vector)
   lazy val startPos: Pos = findChar('S', vector)
   lazy val goal: Pos = findChar('T', vector)
-
 }

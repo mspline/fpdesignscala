@@ -64,10 +64,12 @@ trait Solver extends GameDef {
    */
   def from(initial: Stream[(Block, List[Move])],
            explored: Set[Block]): Stream[(Block, List[Move])] = {
-    for {
+    val more = for {
       i <- initial
       e <- i._1.legalNeighbors
+      if !(explored contains e._1)
     } yield (e._1, e._2 :: i._2)
+    initial #::: from(more, explored ++ more.map(_._1))
   }
 
   /**
